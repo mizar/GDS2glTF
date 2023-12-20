@@ -43,7 +43,7 @@ layerstack = {
     # (65,44): {'name':'tap', 'zmin':0, 'zmax':0.1, 'color':[ 0.4, 0.4, 0.4, 1.0]},    
     (65,20): {'name':'diff', 'zmin':-0.12, 'zmax':0.02, 'color':[ 0.9, 0.9, 0.9, 1.0]},    
     (66,20): {'name':'poly', 'zmin':0, 'zmax':0.18, 'color':[ 0.75, 0.35, 0.46, 1.0]},    
-    (66,44): {'name':'licon', 'zmin':0, 'zmax':0.936, 'color':[ 0.2, 0.2, 0.2, 1.0]},    
+    (66,44): {'name':'licon', 'zmin':0.0001, 'zmax':0.936, 'color':[ 0.2, 0.2, 0.2, 1.0]},    
     (67,20): {'name':'li1', 'zmin':0.936, 'zmax':1.136, 'color':[ 1.0, 0.81, 0.55, 1.0]},    
     (67,44): {'name':'mcon', 'zmin':1.011, 'zmax':1.376, 'color':[ 0.2, 0.2, 0.2, 1.0]},    
     (68,20): {'name':'met1', 'zmin':1.376, 'zmax':1.736, 'color':[ 0.16, 0.38, 0.83, 1.0]},    
@@ -155,8 +155,14 @@ for cell in gdsii.cells.values(): # loop through cells to read paths and polygon
             continue
 
         layers[lnum] = [] if not lnum in layers else layers[lnum]
-        for poly in polygon.polygons:
-            layers[lnum].append((poly, None, False))
+        if lnum == (66, 44) or lnum == (67, 44): # licon or mcon
+            # thin vertical wires
+            thin = gdspy.offset(polygon.polygons, -0.001)
+            for poly in thin.polygons:
+                layers[lnum].append((poly, None, False))
+        else:
+            for poly in polygon.polygons:
+                layers[lnum].append((poly, None, False))
 
 
     
